@@ -519,6 +519,23 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
     // callback(@[success ? [NSNull null] : INVOKE_FAILED]);
 }
 
+RCT_EXPORT_METHOD(openCustomerServiceChat:(NSDictionary *)data
+                  :(RCTResponseSenderBlock)callback)
+{
+    WXOpenCustomerServiceReq* req   = [WXOpenCustomerServiceReq new];
+    req.corpid                      = data[@"corpId"];
+    req.url                         = data[@"url"];
+    
+    void ( ^ completion )( BOOL );
+    completion = ^( BOOL success )
+    {
+        callback(@[success ? [NSNull null] : INVOKE_FAILED]);
+        return;
+    };
+    
+    [WXApi sendReq:req completion:completion];
+}
+
 #pragma mark - wx callback
 
 -(void) onReq:(BaseReq*)req
@@ -580,6 +597,13 @@ RCT_EXPORT_METHOD(pay:(NSDictionary *)data
         body[@"errStr"] = r.errStr;
         body[@"extMsg"] = r.extMsg;
         body[@"type"] = @"WXLaunchMiniProgramReq.Resp";
+        [self.bridge.eventDispatcher sendDeviceEventWithName:RCTWXEventName body:body];
+    } else if ([resp isKindOfClass:[WXOpenCustomerServiceResp class]]){
+        WXOpenCustomerServiceResp *r = (WXOpenCustomerServiceResp *)resp;
+        NSMutableDictionary *body = @{@"errCode":@(r.errCode)}.mutableCopy;
+        body[@"errStr"] = r.errStr;
+        body[@"extMsg"] = r.extMsg;
+        body[@"type"] = @"WXOpenCustomerServiceReq.Resp";
         [self.bridge.eventDispatcher sendDeviceEventWithName:RCTWXEventName body:body];
     }
 }
