@@ -1,0 +1,38 @@
+{
+  "name": "react-native-wechat-lib",
+  "version": "2.0.0",
+  "description": "react-native library for wechat app. 支持分享和拉起小程序。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bashen1/react-native-mwechat.git"
+  },
+  "keywords": [
+    "wechat",
+    "react-native",
+    "react",
+    "react-component",
+    "ios"
+  ],
+  "dependencies": {
+    "events": "1.0.1"
+  },
+  "peerDependencies": {
+    "react-native": ">=0.60"
+  },
+  "author": "bashen1 <maochunjie@gmail.com>",
+  "contributors": [
+    {
+      "name": "little-snow-fox",
+      "email": "fox@sfxh.cc"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bashen1/react-native-mwechat/issues"
+  },
+  "homepage": "https://github.com/bashen1/react-native-mwechat#readme"
+}
