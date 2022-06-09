@@ -17,9 +17,6 @@
     "react-component",
     "ios"
   ],
-  "dependencies": {
-    "events": "1.0.1"
-  },
   "peerDependencies": {
     "react-native": ">=0.60"
   },
