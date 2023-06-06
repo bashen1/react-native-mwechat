@@ -1,11 +1,13 @@
 package com.theweflex.react;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -53,6 +55,9 @@ import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.tencent.mm.opensdk.constants.ConstantsAPI;
 import com.tencent.mm.opensdk.modelbiz.SubscribeMessage;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -73,6 +78,10 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     private final static String INVALID_ARGUMENT = "invalid argument.";
     // 缩略图大小 kb
     private final static int THUMB_SIZE = 32;
+    private static ReactApplicationContext reactContext;
+    private static ReactApplicationContext mRAC;
+    private static ReadableMap cacheInfo;
+    private static String TAG = "WeChatModule";
 
     private static byte[] bitmapTopBytes(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -104,6 +113,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
 
     public WeChatModule(ReactApplicationContext context) {
         super(context);
+        this.reactContext = context;
     }
 
     @Override
@@ -132,9 +142,11 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     @Override
     public void onCatalystInstanceDestroy() {
         super.onCatalystInstanceDestroy();
+        Log.i(TAG, "onCatalystInstanceDestroy");
         if (api != null) {
             api = null;
         }
+        mRAC = null;
         modules.remove(this);
     }
 
@@ -600,6 +612,41 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
            req.url = data.getString("url");
         }
         callback.invoke(null, api.sendReq(req));
+    }
+
+    /**
+     * 获取从微信开放标签打开app携带的extinfo数据
+     * @param callback
+     */
+    @ReactMethod
+    public void getLaunchAppWXExtInfo(Callback callback) {
+        if (getReactApplicationContext().hasActiveCatalystInstance()) {
+            mRAC = getReactApplicationContext();
+            if (cacheInfo != null) {
+                callback.invoke(cacheInfo);
+                cacheInfo = null;
+            } else {
+                callback.invoke();
+            }
+        }
+    }
+
+    public static void handleExtInfoIntent(Activity context, String data) {
+        WritableMap map = Arguments.createMap();
+        String extInfo = data;
+
+        map.putString("extInfo", String.valueOf(extInfo));
+
+        cacheInfo = map;//缓存数据
+        if (mRAC != null) {
+            // 发送receiveShowMessageFromWXListener事件
+            sendEvent("receiveShowMessageFromWXListener", map);
+            cacheInfo = null;
+        }
+    }
+
+    private static void sendEvent(String eventName, @Nullable WritableMap params) {
+        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
     }
 
     private void _share(final int scene, final ReadableMap data, final Callback callback) {
