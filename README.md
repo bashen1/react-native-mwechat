@@ -396,6 +396,8 @@ WeChat.openCustomerServiceChat({
 
 #### getLaunchAppWXExtInfo 获取启动extInfo
 
+- [需要配置项目](./docs/handle-extinfo.md)
+
 ```js
 import * as WeChat from 'react-native-mwechat';
 
@@ -406,6 +408,8 @@ WeChat.getLaunchAppWXExtInfo((extInfo) => {
 ```
 
 #### addReceiveShowMessageFromWXListener extInfo监听
+
+- [需要配置项目](./docs/handle-extinfo.md)
 
 ```js
 import * as WeChat from 'react-native-mwechat';
