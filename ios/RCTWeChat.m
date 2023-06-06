@@ -14,6 +14,8 @@
 @implementation RCTWeChat
 
 @synthesize bridge = _bridge;
+static NSDictionary *cacheInfo;
+static RCTBridge *bridgeCommon;
 
 RCT_EXPORT_MODULE()
 
@@ -110,6 +112,7 @@ RCT_EXPORT_METHOD(registerApp:(NSString *)appid
                   :(RCTResponseSenderBlock)callback)
 {
     self.appId = appid;
+    bridgeCommon = self.bridge;
     callback(@[[WXApi registerApp:appid universalLink:universalLink] ? [NSNull null] : INVOKE_FAILED]);
 }
 
@@ -534,6 +537,32 @@ RCT_EXPORT_METHOD(openCustomerServiceChat:(NSDictionary *)data
     };
     
     [WXApi sendReq:req completion:completion];
+}
+
+// js端获取从微信开放标签打开app携带的extinfo数据
+RCT_EXPORT_METHOD(getLaunchAppWXExtInfo:(RCTResponseSenderBlock) callback)
+{
+    if ((NSString *)cacheInfo[@"extInfo"] != nil) {
+        callback(@[cacheInfo]);
+        cacheInfo = nil;
+    } else {
+        callback(@[]);
+    }
+
+}
+
+// 处理微信开放标签唤醒app的extinfo数据
++ (void)handleExtInfoIntent:(NSString *)data {
+    NSDictionary *extInfoData = @{@"extInfo": data};
+    cacheInfo = extInfoData;//缓存数据
+    if ((NSString *)data != nil && bridgeCommon != nil) {
+        //发送receiveShowMessageFromWXListener事件
+        [bridgeCommon enqueueJSCall:@"RCTDeviceEventEmitter"
+                            method:@"emit"
+                              args:@[@"receiveShowMessageFromWXListener", extInfoData]
+                         completion:NULL];
+        cacheInfo = nil;
+    }
 }
 
 #pragma mark - wx callback

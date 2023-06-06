@@ -481,3 +481,10 @@ export class WechatError extends Error {
   }
 }
 
+export function getLaunchAppWXExtInfo (cb) {
+  WeChat.getLaunchAppWXExtInfo(cb);
+}
+
+export function addReceiveShowMessageFromWXListener (cb) {
+  return DeviceEventEmitter.addListener('receiveShowMessageFromWXListener', cb);
+}

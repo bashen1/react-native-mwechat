@@ -25,6 +25,7 @@
 #define RCTWXEventNameWeChatReq @"WeChat_Req"
 
 @interface RCTWeChat : NSObject <RCTBridgeModule, WXApiDelegate>
++ (void)handleExtInfoIntent: (NSString *)data;
 
 @property NSString* appId;
 

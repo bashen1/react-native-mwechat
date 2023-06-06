@@ -1,12 +1,15 @@
 /*! @brief 请求发送场景
  *
  */
+import { EventSubscription } from 'react-native';
+
 enum WXScene {
   WXSceneSession          = 0,   /**< 聊天界面    */
   WXSceneTimeline         = 1,   /**< 朋友圈     */
   WXSceneFavorite         = 2,   /**< 收藏       */
   WXSceneSpecifiedSession = 3,   /**< 指定联系人  */
 };
+type Callback<T> = (result: T) => void;
 
 declare module "react-native-mwechat" {
   export function registerApp(appId: string, universalLink?: string): Promise<boolean>;
@@ -162,4 +165,8 @@ declare module "react-native-mwechat" {
     corpId: string;
     url: string;
   }): Promise<{ errCode?: number; errStr?: string }>;
+
+  export function getLaunchAppWXExtInfo(callback: Callback<{ extInfo: string }>): void;
+
+  export function addReceiveShowMessageFromWXListener(callback: Callback<{ extInfo: string }>): EventSubscription;
 }
