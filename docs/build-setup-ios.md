@@ -14,9 +14,8 @@ Add "URL Schema" as your app id for "URL type" in Targets > info, See the follow
 ![Set URL Schema in XCode](./../image/url-types.png)
 
 如果不配置，就无法从微信重新回到APP。
-</br>
-</br>
-On iOS 9+, add `wechat` and `weixin` into `LSApplicationQueriesSchemes` in `Targets` > `info` > `Custom iOS Target Properties`. Or edit `Info.plist` then add:
+
+ 在 `Info.plist` 的 `LSApplicationQueriesSchemes` 中添加 `wechat` and `weixin`
 
 ```xml
 <key>LSApplicationQueriesSchemes</key>
@@ -29,7 +28,7 @@ On iOS 9+, add `wechat` and `weixin` into `LSApplicationQueriesSchemes` in `Targ
 
 如果不配置，因为安全权限问题，苹果会阻止你跳转到微信。  
 
-## 2. Then copy the following in `AppDelegate.m`
+## 2. 复制以下内容到 `AppDelegate.m`
 
 微信回调方法，如果不配置，分享的时候微信会出现"正在连接"，然后直接弹回APP。
 
@@ -75,7 +74,7 @@ Universal Links 配置文件, 没使用的话可以忽略。
 
 **注意：不使用 Universal Links 会导致调用微信支付成功后无法获取回调事件。**
 
-## 3. Then copy the following in `AppDelegate.h`
+## 3. 复制以下内容到 `AppDelegate.h`
 
 ```objc
 #import <React/RCTBridgeDelegate.h>

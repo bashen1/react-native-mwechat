@@ -1,26 +1,19 @@
 # Android集成
 
-Then update `MainActivity.java` or `MainApplication.java`:
+在项目的 `android/build.gradle` 添加如下节点
 
 ```java
-import com.theweflex.react.WeChatPackage; // Add this line
-
-  @Override
-  protected List<ReactPackage> getPackages() {
-    @SuppressWarnings("UnnecessaryLocalVariable")
-    List<ReactPackage> packages = new PackageList(this).getPackages();
-    // Packages that cannot be autolinked yet can be added manually here, for example:
-    // packages.add(new MyReactNativePackage());
-    packages.add(new WeChatPackage()); // Add this line
-    return packages;
-  }
+allprojects {
+    repositories {
+        mavenCentral()
+        flatDir { dirs "$rootDir/../node_modules/react-native-mwechat/android/libs" }
+    }
+}
 ```
 
 ## 集成微信登录与分享
 
-If you are going to integrate login or share functions, you need to 
-create a package named 'wxapi' in your application package and a class 
-named `WXEntryActivity` in it.
+如果你需要集成微信的登录与分享功能，需要在主包目录添加 `wxapi` 目录，并在目录下新建一个名为 `WXEntryActivity.java` 的类，内容如下：
 
 ```java
 package your.package.wxapi;
@@ -55,9 +48,7 @@ public class WXEntryActivity extends Activity {
 
 ## 集成微信支付
 
-If you are going to integrate payment functionality by using this library, then
-create a package named also `wxapi` in your application package and a class named
-`WXPayEntryActivity`, this is used to bypass the response to JS level:
+如果你需要集成微信的登录与分享功能，需要在主包目录添加 `wxapi` 目录，并在目录下新建一个名为 `WXPayEntryActivity.java` 的类，内容如下：
 
 ```java
 package your.package.wxapi;
