@@ -28,5 +28,5 @@ allprojects {
 
 dependencies {
   api 'com.facebook.react:react-native:+'
-  api files('libs/wechat-sdk-android-6.8.0.aar')
+  api(name:'wechat-sdk-android-6.8.0', ext:'aar')
 }
