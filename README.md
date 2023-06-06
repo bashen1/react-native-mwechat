@@ -394,6 +394,31 @@ WeChat.openCustomerServiceChat({
 
 ```
 
+#### getLaunchAppWXExtInfo 获取启动extInfo
+
+```js
+import * as WeChat from 'react-native-mwechat';
+
+WeChat.getLaunchAppWXExtInfo((extInfo) => {
+  console.log(JSON.stringify(extInfo))
+})
+
+```
+
+#### addReceiveShowMessageFromWXListener extInfo监听
+
+```js
+import * as WeChat from 'react-native-mwechat';
+
+const subscription = WeChat.addReceiveShowMessageFromWXListener((extInfo) => {
+  console.log(JSON.stringify(extInfo))
+})
+
+// 移除
+subscription?.remove?.();
+
+```
+
 ## License
 
 MIT
