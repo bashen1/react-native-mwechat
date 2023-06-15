@@ -199,6 +199,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
 
     /**
      * 分享文本
+     *
      * @param data
      * @param callback
      */
@@ -222,6 +223,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
 
     /**
      * 分享图片
+     *
      * @param data
      * @param callback
      */
@@ -258,6 +260,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
 
     /**
      * 分享本地图片
+     *
      * @param data
      * @param callback
      */
@@ -319,6 +322,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
 
     /**
      * 分享音乐
+     *
      * @param data
      * @param callback
      */
@@ -366,6 +370,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
 
     /**
      * 分享视频
+     *
      * @param data
      * @param callback
      */
@@ -408,6 +413,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
 
     /**
      * 分享网页
+     *
      * @param data
      * @param callback
      */
@@ -450,6 +456,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
 
     /**
      * 分享小程序
+     *
      * @param data
      * @param callback
      */
@@ -526,6 +533,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
 
     /**
      * 一次性订阅消息
+     *
      * @param data
      * @param callback
      */
@@ -608,12 +616,12 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     public void handleLaunchAppReq() {
         if (cacheLaunchIntent != null) {
             WeChatModule.handleIntent(cacheLaunchIntent);
-            cacheLaunchIntent = null;
         }
     }
 
     /**
      * 缓存启动时微信传过来的信息，在WXEntryActivity中调用
+     *
      * @param launchIntent
      */
     public static void handleLaunchIntent(Intent launchIntent) {
@@ -896,6 +904,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
             map.putString("extMsg", req.message.messageExt);
         }
         this.getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("WeChat_Req", map);
+        cacheLaunchIntent = null;
     }
 
     @Override
@@ -935,6 +944,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
         }
 
         this.getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("WeChat_Resp", map);
+        cacheLaunchIntent = null;
     }
 
     private interface ImageCallback {
