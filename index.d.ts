@@ -1,7 +1,6 @@
 /*! @brief 请求发送场景
  *
  */
-import { EventSubscription } from 'react-native';
 
 enum WXScene {
   WXSceneSession          = 0,   /**< 聊天界面    */
@@ -9,7 +8,6 @@ enum WXScene {
   WXSceneFavorite         = 2,   /**< 收藏       */
   WXSceneSpecifiedSession = 3,   /**< 指定联系人  */
 };
-type Callback<T> = (result: T) => void;
 
 declare module "react-native-mwechat" {
   export function registerApp(appId: string, universalLink?: string): Promise<boolean>;

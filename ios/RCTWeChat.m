@@ -14,8 +14,9 @@
 @implementation RCTWeChat
 
 @synthesize bridge = _bridge;
-static NSDictionary *cacheInfo;
+static BaseReq *cacheLaunchReq;
 static RCTBridge *bridgeCommon;
+static bool hasHandleLaunch = false; // 是否执行过handleLaunchAppReq
 
 RCT_EXPORT_MODULE()
 
@@ -48,6 +49,7 @@ RCT_EXPORT_MODULE()
 
 - (dispatch_queue_t)methodQueue
 {
+    bridgeCommon = self.bridge;
     return dispatch_get_main_queue();
 }
 
@@ -112,7 +114,6 @@ RCT_EXPORT_METHOD(registerApp:(NSString *)appid
                   :(RCTResponseSenderBlock)callback)
 {
     self.appId = appid;
-    bridgeCommon = self.bridge;
     callback(@[[WXApi registerApp:appid universalLink:universalLink] ? [NSNull null] : INVOKE_FAILED]);
 }
 
@@ -539,35 +540,21 @@ RCT_EXPORT_METHOD(openCustomerServiceChat:(NSDictionary *)data
     [WXApi sendReq:req completion:completion];
 }
 
-// js端获取从微信开放标签打开app携带的extinfo数据
-RCT_EXPORT_METHOD(getLaunchAppWXExtInfo:(RCTResponseSenderBlock) callback)
+RCT_EXPORT_METHOD(handleLaunchAppReq)
 {
-    if ((NSString *)cacheInfo[@"extInfo"] != nil) {
-        callback(@[cacheInfo]);
-        cacheInfo = nil;
-    } else {
-        callback(@[]);
-    }
-
-}
-
-// 处理微信开放标签唤醒app的extinfo数据
-+ (void)handleExtInfoIntent:(NSString *)data {
-    NSDictionary *extInfoData = @{@"extInfo": data};
-    cacheInfo = extInfoData;//缓存数据
-    if ((NSString *)data != nil && bridgeCommon != nil) {
-        //发送receiveShowMessageFromWXListener事件
-        [bridgeCommon enqueueJSCall:@"RCTDeviceEventEmitter"
-                            method:@"emit"
-                              args:@[@"receiveShowMessageFromWXListener", extInfoData]
-                         completion:NULL];
-        cacheInfo = nil;
+    hasHandleLaunch = true;
+    if (cacheLaunchReq != nil) {
+        [RCTWeChat handleOnReq:cacheLaunchReq];
     }
 }
 
-#pragma mark - wx callback
+// 处理微信Req，在AppDelegate调用
++ (void)handleLaunchIntent:(BaseReq *)req {
+    cacheLaunchReq = req;//缓存数据
+    [RCTWeChat handleOnReq: req];
+}
 
--(void) onReq:(BaseReq*)req
++ (void)handleOnReq:(BaseReq *)req
 {
     if ([req isKindOfClass:[LaunchFromWXReq class]]) {
         LaunchFromWXReq *launchReq = req;
@@ -577,10 +564,25 @@ RCT_EXPORT_METHOD(getLaunchAppWXExtInfo:(RCTResponseSenderBlock) callback)
         body[@"lang"] =  launchReq.lang;
         body[@"country"] = launchReq.country;
         body[@"extMsg"] = appParameter;
-        [self.bridge.eventDispatcher sendDeviceEventWithName:RCTWXEventNameWeChatReq body:body];
+        
+        [bridgeCommon.eventDispatcher sendDeviceEventWithName:RCTWXEventNameWeChatReq body:body];
+    }
+    
+    // 未处理过handleLaunchAppReq，不做清除缓存
+    if (hasHandleLaunch == true) {
+        cacheLaunchReq = nil;
     }
 }
 
+#pragma mark - wx callback
+
+// 如果在AppDelegate绑定WXApiDelegate，此方法不会再触发
+-(void) onReq:(BaseReq*)req
+{
+    [RCTWeChat handleOnReq:req];
+}
+
+// 如果在AppDelegate绑定WXApiDelegate，此方法还是会触发
 -(void) onResp:(BaseResp*)resp
 {
     if([resp isKindOfClass:[SendMessageToWXResp class]])
