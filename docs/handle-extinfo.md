@@ -4,7 +4,7 @@
 
 ## iOS
 
-在 `AppDelegate.mm` 添加微信处理回调，此方法会获取到值传递到模块内的handleExtInfoIntent方法
+在 `AppDelegate.mm` 添加微信处理回调，此方法会获取到值传递到模块内的handleLaunchIntent方法，如果在AppDelegate处添加了WXApiDelegate，则模块内的onReq不再触发，但是onResp正常触发
 
 ```objc
 #import "RCTWeChat.h"
@@ -15,87 +15,32 @@
  * @param req 具体请求内容，是自动释放的
  */
 - (void)onReq:(BaseReq*)req {
-    if ([req isKindOfClass:[LaunchFromWXReq class]]) {
-        //从微信启动 获取开放标签传递的extinfo数据逻辑
-        LaunchFromWXReq *temp = (LaunchFromWXReq *)req;
-        WXMediaMessage *msg = temp.message;
-        // NSString *openID = temp.openID;
-        NSString *extinfo = msg.messageExt;
-        [RCTWeChat handleExtInfoIntent:extinfo];
-    }
+    [RCTWeChat handleLaunchIntent: req];
 }
 ```
 
 ## Android
 
-调整
+调整 `WXEntryActivity.java` 为如下代码，如果没有则新建
 
 ```java
-package your.package;
+package your.package.wxapi;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.text.TextUtils;
-
-import com.tencent.mm.opensdk.constants.ConstantsAPI;
-import com.tencent.mm.opensdk.modelbase.BaseReq;
-import com.tencent.mm.opensdk.modelbase.BaseResp;
-import com.tencent.mm.opensdk.modelmsg.ShowMessageFromWX;
-import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
-import com.tencent.mm.opensdk.openapi.IWXAPI;
-import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
-import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.theweflex.react.WeChatModule;
 
-public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
-    private IWXAPI api;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //初始化和注册
-        api = WXAPIFactory.createWXAPI(this, "XXXXX", false); // 微信appid
-        Intent intent = getIntent();
-        api.handleIntent(intent, this);
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
-        api.handleIntent(intent, this);
-    }
-
-    /**
-     * 从微信启动App
-     *
-     * @param req
-     */
-    @Override
-    public void onReq(BaseReq req) {
-        //获取开放标签传递的extinfo数据逻辑
-        if (req.getType() == ConstantsAPI.COMMAND_SHOWMESSAGE_FROM_WX && req instanceof ShowMessageFromWX.Req) {
-            ShowMessageFromWX.Req showReq = (ShowMessageFromWX.Req) req;
-            WXMediaMessage mediaMsg = showReq.message;
-            String extInfo = mediaMsg.messageExt;
-
-            if (TextUtils.isEmpty(extInfo)) return;
-
-            WeChatModule.handleExtInfoIntent(this, extInfo);
-
-            PackageManager packageManager = getPackageManager();
-            Intent intent = packageManager.getLaunchIntentForPackage(this.getPackageName());
-            startActivity(intent);
-            finish();
-        }
-    }
-
-    @Override
-    public void onResp(BaseResp resp) {
-    }
+public class WXEntryActivity extends Activity {
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    PackageManager packageManager = getPackageManager();
+    Intent intent = packageManager.getLaunchIntentForPackage(this.getPackageName());
+    startActivity(intent);
+    // 注意：以下Intent顺序不能调整
+    WeChatModule.handleIntent(getIntent());
+    WeChatModule.handleLaunchIntent(getIntent());
+    finish();
+  }
 }
-
-
 ```

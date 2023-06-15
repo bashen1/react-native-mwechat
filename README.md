@@ -394,33 +394,24 @@ WeChat.openCustomerServiceChat({
 
 ```
 
-#### getLaunchAppWXExtInfo 获取启动extInfo
+#### handleLaunchAppReq 获取启动onReq信息
+
+为了解决微信唤醒App时原生端先触发，但是ReactJs还未准备好，所以以下项目配置信息会缓存启动的时的数据，等调用handleLaunchAppReq时触发`WeChat_Req`
+
+此方法会触发模块的`WeChat_Req`，所以在调用此方法之前需要添加`WeChat_Req`监听
 
 - [需要配置项目](./docs/handle-extinfo.md)
 
 ```js
 import * as WeChat from 'react-native-mwechat';
 
-WeChat.getLaunchAppWXExtInfo((extInfo) => {
-  console.log(JSON.stringify(extInfo))
-})
+WeChat.registerApp(config.wechat.appID, config.wechat.universalLink); //需要调用
+let _wechatReq = DeviceEventEmitter.addListener('WeChat_Req', req => {
+  console.log(JSON.stringify(req));
+});
+WeChat.handleLaunchAppReq();
 
-```
-
-#### addReceiveShowMessageFromWXListener extInfo监听
-
-- [需要配置项目](./docs/handle-extinfo.md)
-
-```js
-import * as WeChat from 'react-native-mwechat';
-
-const subscription = WeChat.addReceiveShowMessageFromWXListener((extInfo) => {
-  console.log(JSON.stringify(extInfo))
-})
-
-// 移除
-subscription?.remove?.();
-
+_wechatReq?.remove?.(); //销毁时记得移除监听
 ```
 
 ## License
