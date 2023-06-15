@@ -1,18 +1,15 @@
 package com.theweflex.react;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Environment;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import com.facebook.common.executors.UiThreadImmediateExecutorService;
-import com.facebook.common.internal.Files;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.common.util.UriUtil;
 import com.facebook.datasource.DataSource;
@@ -31,7 +28,6 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.tencent.mm.opensdk.constants.Build;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.modelbiz.WXOpenCustomerServiceChat;
@@ -55,17 +51,9 @@ import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.tencent.mm.opensdk.constants.ConstantsAPI;
 import com.tencent.mm.opensdk.modelbiz.SubscribeMessage;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -79,8 +67,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     // 缩略图大小 kb
     private final static int THUMB_SIZE = 32;
     private static ReactApplicationContext reactContext;
-    private static ReactApplicationContext mRAC;
-    private static ReadableMap cacheInfo;
+    private static Intent cacheLaunchIntent;
     private static String TAG = "WeChatModule";
 
     private static byte[] bitmapTopBytes(Bitmap bitmap) {
@@ -146,7 +133,6 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
         if (api != null) {
             api = null;
         }
-        mRAC = null;
         modules.remove(this);
     }
 
@@ -269,6 +255,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
 
     }
     // private static final String SDCARD_ROOT = Environment.getExternalStorageDirectory().getAbsolutePath();
+
     /**
      * 分享本地图片
      * @param data
@@ -284,7 +271,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
             }
 //            int maxWidth = data.hasKey("maxWidth") ? data.getInt("maxWidth") : -1;
             fs = new FileInputStream(path);
-            Bitmap bmp  = BitmapFactory.decodeStream(fs);
+            Bitmap bmp = BitmapFactory.decodeStream(fs);
 
 //            if (maxWidth > 0) {
 //                bmp = Bitmap.createScaledBitmap(bmp, maxWidth, bmp.getHeight() / bmp.getWidth() * maxWidth, true);
@@ -606,43 +593,31 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
 
         WXOpenCustomerServiceChat.Req req = new WXOpenCustomerServiceChat.Req();
         if (data.hasKey("corpId")) {
-           req.corpId = data.getString("corpId");
+            req.corpId = data.getString("corpId");
         }
         if (data.hasKey("url")) {
-           req.url = data.getString("url");
+            req.url = data.getString("url");
         }
         callback.invoke(null, api.sendReq(req));
     }
 
     /**
-     * 获取从微信开放标签打开app携带的extinfo数据
-     * @param callback
+     * 因为启动时js还未准备好，需要手动触发下
      */
     @ReactMethod
-    public void getLaunchAppWXExtInfo(Callback callback) {
-        if (getReactApplicationContext().hasActiveCatalystInstance()) {
-            mRAC = getReactApplicationContext();
-            if (cacheInfo != null) {
-                callback.invoke(cacheInfo);
-                cacheInfo = null;
-            } else {
-                callback.invoke();
-            }
+    public void handleLaunchAppReq() {
+        if (cacheLaunchIntent != null) {
+            WeChatModule.handleIntent(cacheLaunchIntent);
+            cacheLaunchIntent = null;
         }
     }
 
-    public static void handleExtInfoIntent(Activity context, String data) {
-        WritableMap map = Arguments.createMap();
-        String extInfo = data;
-
-        map.putString("extInfo", String.valueOf(extInfo));
-
-        cacheInfo = map;//缓存数据
-        if (mRAC != null) {
-            // 发送receiveShowMessageFromWXListener事件
-            sendEvent("receiveShowMessageFromWXListener", map);
-            cacheInfo = null;
-        }
+    /**
+     * 缓存启动时微信传过来的信息，在WXEntryActivity中调用
+     * @param launchIntent
+     */
+    public static void handleLaunchIntent(Intent launchIntent) {
+        cacheLaunchIntent = launchIntent;//缓存数据
     }
 
     private static void sendEvent(String eventName, @Nullable WritableMap params) {
@@ -716,18 +691,12 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
             return null;
         }
         name = name.toLowerCase().replace("-", "_");
-        int resId = context.getResources().getIdentifier(
-                name,
-                "drawable",
-                context.getPackageName());
+        int resId = context.getResources().getIdentifier(name, "drawable", context.getPackageName());
 
         if (resId == 0) {
             return null;
         } else {
-            return new Uri.Builder()
-                    .scheme(UriUtil.LOCAL_RESOURCE_SCHEME)
-                    .path(String.valueOf(resId))
-                    .build();
+            return new Uri.Builder().scheme(UriUtil.LOCAL_RESOURCE_SCHEME).path(String.valueOf(resId)).build();
         }
     }
 
@@ -925,9 +894,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
             map.putString("lang", req.lang);
             map.putString("country", req.message.messageExt);
         }
-        this.getReactApplicationContext()
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit("WeChat_Resp", map);
+        this.getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("WeChat_Resp", map);
     }
 
     @Override
@@ -966,9 +933,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
             map.putString("type", "WXOpenCustomerServiceReq.Resp");
         }
 
-        this.getReactApplicationContext()
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit("WeChat_Resp", map);
+        this.getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("WeChat_Resp", map);
     }
 
     private interface ImageCallback {

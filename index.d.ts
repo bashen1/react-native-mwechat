@@ -166,7 +166,5 @@ declare module "react-native-mwechat" {
     url: string;
   }): Promise<{ errCode?: number; errStr?: string }>;
 
-  export function getLaunchAppWXExtInfo(callback: Callback<{ extInfo: string }>): void;
-
-  export function addReceiveShowMessageFromWXListener(callback: Callback<{ extInfo: string }>): EventSubscription;
+  export function handleLaunchAppReq(): void;
 }
