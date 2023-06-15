@@ -66,9 +66,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     private final static String INVALID_ARGUMENT = "invalid argument.";
     // 缩略图大小 kb
     private final static int THUMB_SIZE = 32;
-    private static ReactApplicationContext reactContext;
     private static Intent cacheLaunchIntent;
-    private static String TAG = "WeChatModule";
 
     private static byte[] bitmapTopBytes(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -100,7 +98,6 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
 
     public WeChatModule(ReactApplicationContext context) {
         super(context);
-        this.reactContext = context;
     }
 
     @Override
@@ -129,7 +126,6 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     @Override
     public void onCatalystInstanceDestroy() {
         super.onCatalystInstanceDestroy();
-        Log.i(TAG, "onCatalystInstanceDestroy");
         if (api != null) {
             api = null;
         }
@@ -626,10 +622,6 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
      */
     public static void handleLaunchIntent(Intent launchIntent) {
         cacheLaunchIntent = launchIntent;//缓存数据
-    }
-
-    private static void sendEvent(String eventName, @Nullable WritableMap params) {
-        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
     }
 
     private void _share(final int scene, final ReadableMap data, final Callback callback) {
