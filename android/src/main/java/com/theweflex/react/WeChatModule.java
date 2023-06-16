@@ -66,7 +66,8 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
     private final static String INVALID_ARGUMENT = "invalid argument.";
     // 缩略图大小 kb
     private final static int THUMB_SIZE = 32;
-    private static Intent cacheLaunchIntent;
+    private static Intent cacheLaunchIntent; // 缓存，只用于handleLaunchAppReq
+    private boolean hasHandleLaunch = false; // 是否执行过handleLaunchAppReq
 
     private static byte[] bitmapTopBytes(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -610,6 +611,7 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
      */
     @ReactMethod
     public void handleLaunchAppReq() {
+        hasHandleLaunch = true;
         if (cacheLaunchIntent != null) {
             WeChatModule.handleIntent(cacheLaunchIntent);
         }
@@ -896,7 +898,10 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
             map.putString("extMsg", req.message.messageExt);
         }
         this.getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("WeChat_Req", map);
-        cacheLaunchIntent = null;
+        // 未处理过handleLaunchAppReq，不做清除缓存
+        if (hasHandleLaunch) {
+            cacheLaunchIntent = null;
+        }
     }
 
     @Override
@@ -936,7 +941,11 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
         }
 
         this.getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("WeChat_Resp", map);
-        cacheLaunchIntent = null;
+
+        // 未处理过handleLaunchAppReq，不做清除缓存
+        if (hasHandleLaunch) {
+            cacheLaunchIntent = null;
+        }
     }
 
     private interface ImageCallback {
