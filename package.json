@@ -1,6 +1,6 @@
 {
   "name": "react-native-mwechat",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "react-native library for wechat app. 支持分享和拉起小程序。",
   "main": "index.js",
   "scripts": {
