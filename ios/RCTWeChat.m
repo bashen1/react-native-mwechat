@@ -551,8 +551,7 @@ RCT_EXPORT_METHOD(handleLaunchAppReq)
 // 处理微信Req，在AppDelegate调用
 + (void)handleLaunchIntent:(BaseReq *)req {
     cacheLaunchReq = req;//缓存数据
-    if (req != nil) {
-        hasHandleLaunch = true;
+    if (hasHandleLaunch == true) {
         [RCTWeChat handleOnReq: req];
     }
 }

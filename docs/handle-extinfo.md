@@ -6,6 +6,8 @@
 
 在 `AppDelegate.mm` 添加微信处理回调，此方法会获取到值传递到模块内的handleLaunchIntent方法，如果在AppDelegate处添加了WXApiDelegate，则模块内的onReq不再触发，但是onResp正常触发
 
+如果`AppDelegate.mm`接管onReq，请务必在ReactJs调用`handleLaunchAppReq`，因为有一个状态锁需要打开
+
 ```objc
 #import "RCTWeChat.h"
 
