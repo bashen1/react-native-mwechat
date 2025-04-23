@@ -12,12 +12,12 @@ Pod::Spec.new do |s|
   s.author        = package['author']
   s.platform      = :ios, "9.0"
   s.source        = { :git => "https://github.com/bashen1/react-native-mwechat.git", :tag => "master" }
-  s.source_files  = "ios/*.{h,m}", "ios/OpenSDK/*.{h,m}"
-  s.vendored_libraries = "ios/OpenSDK/libWeChatSDK.a"
+  s.source_files  = "ios/*.{h,m}"
+  s.vendored_frameworks = "ios/*.xcframework"
   s.requires_arc  = true
   s.frameworks = 'SystemConfiguration','CoreTelephony'
   s.library = 'sqlite3','c++','z'
 
-  s.dependency "React"
+  s.dependency "React-Core"
 
 end
