@@ -7,14 +7,14 @@
 
 [React Native] bridging library that integrates WeChat SDKs:
 
-- [x] iOS SDK 1.9.2
+- [x] iOS SDK 2.0.4
 - [x] Android SDK 6.8.0
 
 ## 前言
 
-首先向各位声明，本库是在 [react-native-wechat-lib](https://github.com/little-snow-fox/react-native-wechat-lib) 基础上进行调整。  
+首先向各位声明，本库是在 [react-native-wechat-lib](https://github.com/little-snow-fox/react-native-wechat-lib) 基础上进行调整。
 
-由于 react-native-wechat-lib 所使用的 WeChat SDK 已经是几年前的版本，考虑到自身使用和其它开发者的需要，最终决定开一个新仓库，提供给新项目使用。  
+由于 react-native-wechat-lib 所使用的 WeChat SDK 已经是几年前的版本，考虑到自身使用和其它开发者的需要，最终决定开一个新仓库，提供给新项目使用。
 
 最后
 
@@ -42,7 +42,7 @@ react-native link react-native-mwechat
 
 ## API文档
 
-本库支持 `TypeScript`，使用 `Promise` 或 `async/await` 来接收返回。  
+本库支持 `TypeScript`，使用 `Promise` 或 `async/await` 来接收返回。
 
 接口名称和参数尽量跟腾讯官网保持一致性，除了嵌套对象变成扁平对象，你可以直接查看腾讯文档来获得更多帮助。
 
@@ -89,7 +89,7 @@ Open the WeChat app from your application.
 - `state` {String} the state of OAuth2
 - returns {Object}
 
-Send authentication request, and it returns an object with the 
+Send authentication request, and it returns an object with the
 following fields:
 
 | field   | type   | description                         |
@@ -185,16 +185,16 @@ WeChat.ShareLocalImage({
 
 ShareMusicMetadata
 
-| name                | type   | description                   |  
-|---------------------|--------|-------------------------------|  
-| title               | String | 标题                           |  
-| description         | String | 描述                           |  
-| thumbImageUrl       | String | 缩略图地址，本库会自动压缩到32KB   |  
-| musicUrl            | String | 音频网页的URL地址                |  
-| musicLowBandUrl     | String | 供低带宽环境下使用的音频网页URL地址 |  
-| musicDataUrl        | String | 音频数据的URL地址                |  
-| musicLowBandDataUrl | String | 供低带宽环境下使用的音频数据URL地址 |  
-| scene               | Number | 分享到, 0:会话 1:朋友圈 2:收藏    |  
+| name                | type   | description                   |
+|---------------------|--------|-------------------------------|
+| title               | String | 标题                           |
+| description         | String | 描述                           |
+| thumbImageUrl       | String | 缩略图地址，本库会自动压缩到32KB   |
+| musicUrl            | String | 音频网页的URL地址                |
+| musicLowBandUrl     | String | 供低带宽环境下使用的音频网页URL地址 |
+| musicDataUrl        | String | 音频数据的URL地址                |
+| musicLowBandDataUrl | String | 供低带宽环境下使用的音频数据URL地址 |
+| scene               | Number | 分享到, 0:会话 1:朋友圈 2:收藏    |
 
 Return:
 
