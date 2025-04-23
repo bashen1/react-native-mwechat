@@ -5,29 +5,29 @@
 #import "WXApi.h"
 
 // define share type constants
-#define RCTWXShareTypeNews @"news"
+#define RCTWXShareTypeNews          @"news"
 #define RCTWXShareTypeThumbImageUrl @"thumbImage"
-#define RCTWXShareTypeImageUrl @"imageUrl"
-#define RCTWXShareTypeImageFile @"imageFile"
+#define RCTWXShareTypeImageUrl      @"imageUrl"
+#define RCTWXShareTypeImageFile     @"imageFile"
 #define RCTWXShareTypeImageResource @"imageResource"
-#define RCTWXShareTypeText @"text"
-#define RCTWXShareTypeVideo @"video"
-#define RCTWXShareTypeAudio @"audio"
-#define RCTWXShareTypeFile @"file"
+#define RCTWXShareTypeText          @"text"
+#define RCTWXShareTypeVideo         @"video"
+#define RCTWXShareTypeAudio         @"audio"
+#define RCTWXShareTypeFile          @"file"
 
-#define RCTWXShareType @"type"
-#define RCTWXShareTitle @"title"
-#define RCTWXShareDescription @"description"
-#define RCTWXShareWebpageUrl @"webpageUrl"
-#define RCTWXShareImageUrl @"imageUrl"
+#define RCTWXShareType              @"type"
+#define RCTWXShareTitle             @"title"
+#define RCTWXShareDescription       @"description"
+#define RCTWXShareWebpageUrl        @"webpageUrl"
+#define RCTWXShareImageUrl          @"imageUrl"
 
-#define RCTWXEventName @"WeChat_Resp"
-#define RCTWXEventNameWeChatReq @"WeChat_Req"
+#define RCTWXEventName              @"WeChat_Resp"
+#define RCTWXEventNameWeChatReq     @"WeChat_Req"
 
-@interface RCTWeChat : NSObject <RCTBridgeModule, WXApiDelegate>
-+ (void)handleLaunchIntent: (BaseReq *)req;
-+ (void)handleOnReq: (BaseReq *)req;
+@interface RCTWeChat : NSObject <RCTBridgeModule>
++ (void)onReq:(BaseReq *)req;
++ (void)onResp:(BaseResp *)resp;
 
-@property NSString* appId;
+@property NSString *appId;
 
 @end
