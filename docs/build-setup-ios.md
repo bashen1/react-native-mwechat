@@ -72,6 +72,18 @@ Universal Links 配置文件, 没使用的话可以忽略。
 }
 ```
 
+```objc
+// 微信回调方法
+#pragma mark --微信--
+- (void)onReq:(BaseReq*)req {
+  [RCTWeChat onReq:req];
+}
+
+-(void)onResp:(BaseResp*)resp {
+  [RCTWeChat onResp:resp];
+}
+```
+
 **注意：不使用 Universal Links 会导致调用微信支付成功后无法获取回调事件。**
 
 ## 3. 复制以下内容到 `AppDelegate.h`
