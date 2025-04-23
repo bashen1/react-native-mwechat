@@ -394,7 +394,7 @@ WeChat.openCustomerServiceChat({
 
 ```
 
-#### handleLaunchAppReq 获取启动onReq信息
+#### handleLaunchAppReq 获取启动onReq信息（务必在启动后进行调用）
 
 为了解决微信唤醒App时原生端先触发，但是ReactJs还未准备好，所以以下项目配置信息会缓存启动的时的数据，等调用handleLaunchAppReq时触发`WeChat_Req`
 

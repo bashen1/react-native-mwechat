@@ -8,18 +8,6 @@
 
 如果`AppDelegate.mm`接管onReq，请务必在ReactJs调用`handleLaunchAppReq`，因为有一个状态锁需要打开
 
-```objc
-#import "RCTWeChat.h"
-
-/*! @brief 收到一个来自微信的请求，第三方应用程序处理完后调用sendResp向微信发送结果
- * 收到一个来自微信的请求，异步处理完成后必须调用sendResp发送处理结果给微信。
- * 可能收到的请求有GetMessageFromWXReq、ShowMessageFromWXReq等。
- * @param req 具体请求内容，是自动释放的
- */
-- (void)onReq:(BaseReq*)req {
-    [RCTWeChat handleLaunchIntent: req];
-}
-```
 
 ## Android
 
