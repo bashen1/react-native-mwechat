@@ -89,12 +89,24 @@ public class WeChatModule extends ReactContextBaseJavaModule implements IWXAPIEv
             if (options > 10) {
                 options -= 8;
             } else {
-                return bitmapResizeGetBytes(Bitmap.createScaledBitmap(image, 280, image.getHeight() / image.getWidth() * 280, true), size);
+                int dstHeight = getDstHeight(image);
+                return bitmapResizeGetBytes(Bitmap.createScaledBitmap(image, 280, dstHeight, true), size);
             }
             // 这里压缩options%，把压缩后的数据存放到baos中
             image.compress(Bitmap.CompressFormat.JPEG, options, baos);
         }
         return baos.toByteArray();
+    }
+
+    private static int getDstHeight(Bitmap image) {
+        int dstHeight = image.getHeight() / image.getWidth() * 280;
+        if (dstHeight <= 0) {
+            dstHeight = image.getHeight() * 280 / image.getWidth();
+        }
+        if (dstHeight <= 0) {
+            dstHeight = 280;
+        }
+        return dstHeight;
     }
 
     public WeChatModule(ReactApplicationContext context) {
