@@ -4,7 +4,7 @@ import { DeviceEventEmitter, NativeModules, Platform } from 'react-native';
 import { EventEmitter } from 'events';
 
 let isAppRegistered = false;
-const { WeChat } = NativeModules;
+const WeChat = NativeModules.WeChat || NativeModules.RCTWeChat;
 
 // Event emitter to dispatch request and response from WeChat.
 const emitter = new EventEmitter();
